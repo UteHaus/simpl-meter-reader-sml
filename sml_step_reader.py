@@ -65,9 +65,16 @@ def parsBytesToNumber(data: bytes, sequencHex: str):
             return struct.unpack(">i", data)[0]
         elif len(data) == 8:
             return struct.unpack(">q", data)[0]
-        else:
-            return 0
-    return int.from_bytes(data)
+    else:
+        if len(data) == 1:
+            return struct.unpack(">B", data)[0]
+        elif len(data) == 2:
+            return struct.unpack(">H", data)[0]
+        elif len(data) == 4:
+            return struct.unpack(">I", data)[0]
+        elif len(data) == 8:
+            return struct.unpack(">Q", data)[0]
+    return 0
 
 
 def parsValueToString(value: bytes):
@@ -84,7 +91,7 @@ def parsSmlBlock(data: bytes, smlBlock: SmlBlock, sequenzCount=-1):
         if sequencHex == "00":
             data = data[1:]
         elif sequencHex.startswith("0") and sequencHex != "00":
-            dataLenght = int.from_bytes(bytes.fromhex(sequencHex)) - 1
+            dataLenght = int.from_bytes(bytes.fromhex(sequencHex), "big") - 1
             if dataLenght > 0:
                 dataValue = data[1:dataLenght]
                 smlBlock.values.append(parsValueToString(dataValue))
@@ -173,7 +180,6 @@ def encodeSml(data: bytes, smlConfig: SmlConfig):
             newSmlBlock = trimSmlBlock(changedBlock)
             findSmlBlock.append(newSmlBlock)
             logging.debug("Find sml block: \n{}".format(newSmlBlock.reprJSON()))
-            print(newSmlBlock.reprJSON())
         except Exception as e:
             logging.error(e)
             pass
