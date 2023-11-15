@@ -1,0 +1,25 @@
+mqtt: 
+  sensor:
+  - name: "total_energy"
+    unique_id: "c1b149f7-c8db-43ba-ae92-d1b1dbb71296"
+    state_topic: "meter/grid/meter1/180"
+    unit_of_measurement: 'kWh'
+    device_class: energy
+    value_template: '{{ value_json / 1000  | int }}'
+    state_class: total
+  - name: "grid_feed"
+    unique_id: "dbfb9284-f934-461e-b5fa-c91385938332"
+    state_topic: "meter/grid/meter1/280"
+    unit_of_measurement: 'kWh'
+    device_class: energy
+    value_template: '{{ value_json / 10000  | int }}'
+    state_class: total
+  - name: "current_consumption"
+    unique_id: "5076301c-2325-48ac-9ae9-9e4b91e40de5"
+    state_topic: "meter/grid/meter1/107"
+    unit_of_measurement: 'kW'
+    device_class: energy
+    value_template: '{{ value_json / 1000  | int }}'
+    state_class: measurement
+
+
