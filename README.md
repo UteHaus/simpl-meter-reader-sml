@@ -1,4 +1,5 @@
-# simple meter read (SML)
+# simple meter read (SML)  ----- CURRENTLY IN PROGRESS ------
+
 
 This tool help you to read SML based meters.
 
