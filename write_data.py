@@ -34,9 +34,6 @@ class MqttDataWriter(WriteData):
         self.qos = qos
         self.client = mqtt.Client()
 
-    def resultsToString(self, data: SmlEntry):
-        return stringList.append(json.dumps(item.__dict__))
-
     def createTopic(self, value: SmlEntry):
         return str(self.topic) + str(value.obis)
 

@@ -79,7 +79,7 @@ def parsBytesToNumber(data: bytes, sequencHex: str):
 
 def parsValueToString(value: bytes):
     try:
-        return bin_value.decode("ascii")
+        return value.decode("ascii")
     except Exception:
         return value.hex()
 
