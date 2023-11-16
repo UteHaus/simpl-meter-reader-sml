@@ -7,7 +7,7 @@ import logging
 
 class SmlEntry:
     def sensorValue(self, baseValue: int, scaler: float):
-        if baseValue != "string" and baseValue is not None:
+        if isinstance(baseValue, str) == False and baseValue is not None:
             return float(baseValue) if scaler <= 0 else float(baseValue) * float(scaler)
         else:
             return baseValue
@@ -59,7 +59,9 @@ def convertSmlBlockToObisEntry(
         obis=obisKey,
         status=findValueForObisIndex(smlBlock, obisValueIndex.statusIndex),
         baseValue=findValueForObisIndex(smlBlock, obisValueIndex.valueIndex),
-        scaler=findValueForObisIndex(smlBlock, obisValueIndex.scalerIndex),
+        scaler=obisValueIndex.manualScaler
+        if obisValueIndex.manualScaler is not None
+        else findValueForObisIndex(smlBlock, obisValueIndex.scalerIndex),
         unit=findValueForObisIndex(smlBlock, obisValueIndex.unitIndex),
         valTime=findValueForObisIndex(smlBlock, obisValueIndex.statusIndex),
         valueSignature=findValueForObisIndex(smlBlock, obisValueIndex.valueSignature),

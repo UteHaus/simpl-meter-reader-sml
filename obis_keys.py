@@ -52,6 +52,7 @@ class ObisEntryValueIndex:
         valueIndex: int,
         valueSignature: int,
         obisKey: str = None,
+        manualScaler: float = None,
     ):
         self.obisIndex = obisIndex
         self.statusIndex = statusIndex
@@ -60,3 +61,4 @@ class ObisEntryValueIndex:
         self.scalerIndex = scalerIndex
         self.valueIndex = valueIndex
         self.valueSignature = valueSignature
+        self.manualScaler = manualScaler

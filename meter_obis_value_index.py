@@ -42,14 +42,7 @@ class MeterProperties:
 def findMeterConfiguration(meterKey: Union[Meters, str]):
     meter = Meters[meterKey] if isinstance(meterKey, str) else meterKey
     if Meters.BZPlus3 == meter:
-        obisValueIndexBzPlus = MeterProperties(
-            ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1),
-            SmlConfig(startEscapeSequenz="001b1b1b"),
-        )
-        obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
-            "0100100700", ObisEntryValueIndex(0, -1, -1, 3, 4, 5, -1)
-        )
-        return obisValueIndexBzPlus
+        return bZPlus3Configuration()
 
     logging.warning(
         "No supported meter for {}. Add new device on file meter_obis_value_index.py".format(
@@ -63,3 +56,25 @@ def findMeterConfiguration(meterKey: Union[Meters, str]):
 
 def findSupportedMeter():
     return list(Meters)
+
+def bZPlus3Configuration():
+        gridFeedValueIndex = ObisEntryValueIndex(
+            0, -1, -1, 2, 3, 4, -1, manualScaler=0.1
+        )
+        obisValueIndexBzPlus = MeterProperties(
+            ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1),
+            SmlConfig(startEscapeSequenz="001b1b1b"),
+        )
+        obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
+            "0100020800", gridFeedValueIndex
+        )
+        obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
+            "0100020801", gridFeedValueIndex
+        )
+        obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
+            "0100020802", gridFeedValueIndex
+        )
+        obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
+            "0100100700", ObisEntryValueIndex(0, -1, -1, 3, 4, 5, -1)
+        )
+        return obisValueIndexBzPlus
