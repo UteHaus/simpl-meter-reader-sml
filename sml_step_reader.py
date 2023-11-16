@@ -1,9 +1,14 @@
 #!/usr/bin/python3
 import logging
-import sys
-import array
 import json
 import struct
+
+try:
+    # hexlify for micropython
+    from ubinascii import hexlify
+except ImportError:
+    # default to python standard
+    from binascii import hexlify
 
 escapeSequenz: str = "1b1b1b1b"
 smlVersion = "01010101"
@@ -79,8 +84,9 @@ def parsBytesToNumber(data: bytes, sequencHex: str):
 
 def parsValueToString(value: bytes):
     try:
-        return value.decode("ascii")
-    except Exception:
+        return hexlify(value).decode("ascii")
+    except Exception as e:
+        logging.exception(e)
         return value.hex()
 
 
@@ -133,7 +139,6 @@ def parsSmlBlock(data: bytes, smlBlock: SmlBlock, sequenzCount=-1):
 def findMessageWithEscapeSequenc(data: bytes, smlConfig: SmlConfig):
     msgBlocks = []
     startMsgBlockIndex = 0
-    msgBlock: bytes
     endEscapeSequenzBytes = bytes.fromhex(smlConfig.endEscapeSequenz)
     msgBlockStartBlockBytes = bytes.fromhex(smlConfig.msgBlockStartBlock)
     while data.find(msgBlockStartBlockBytes) >= 0:
@@ -168,6 +173,7 @@ def trimSmlBlock(smlBlock: SmlBlock):
 
 
 def encodeSml(data: bytes, smlConfig: SmlConfig):
+    logging.debug("encode sml data (bytes)")
     msgBlocks = findMessageWithEscapeSequenc(data, smlConfig)
     if len(msgBlocks) == 0:
         logging.warning("Non message block found in the data.")
@@ -182,5 +188,5 @@ def encodeSml(data: bytes, smlConfig: SmlConfig):
             logging.debug("Find sml block: \n{}".format(newSmlBlock.reprJSON()))
         except Exception as e:
             logging.error(e)
-            pass
+
     return findSmlBlock
