@@ -1,0 +1,25 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python: run test",
+            "type": "python",
+            "request": "launch",
+            "program": "read_meter_values.py",
+            "console": "integratedTerminal",
+            "justMyCode": true,
+            "args": [
+                "--test",
+                "--meter",
+                "BZPlus3",
+                "--file",
+                "sml_files/bz-pus-10.hex",
+                "-l",
+                "DEBUG"
+            ]
+        }
+    ]
+}

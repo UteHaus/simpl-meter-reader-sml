@@ -4,6 +4,7 @@ from obis_keys import ObisEntryValueIndex
 from enum import Enum
 from sml_step_reader import SmlConfig
 import logging
+from typing import Union
 
 
 class Meters(Enum):
@@ -38,8 +39,9 @@ class MeterProperties:
         return self.defaultValueIndex
 
 
-def findMeterConfiguration(meterKey: str):
-    if Meters.BZPlus3.value == meterKey:
+def findMeterConfiguration(meterKey: Union[Meters, str]):
+    meter = Meters[meterKey] if isinstance(meterKey, str) else meterKey
+    if Meters.BZPlus3 == meter:
         obisValueIndexBzPlus = MeterProperties(
             ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1),
             SmlConfig(startEscapeSequenz="001b1b1b"),
@@ -50,7 +52,7 @@ def findMeterConfiguration(meterKey: str):
         return obisValueIndexBzPlus
 
     logging.warning(
-        "No supported meter for {}. And a new one on file meter_obis_value_index.py".format(
+        "No supported meter for {}. Add new device on file meter_obis_value_index.py".format(
             meterKey
         )
     )

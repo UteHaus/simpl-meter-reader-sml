@@ -2,7 +2,6 @@
 
 import argparse
 import sys
-import threading
 import time
 import logging
 from typing import List
@@ -15,6 +14,7 @@ from meter_obis_value_index import (
     findMeterConfiguration,
     MeterProperties,
 )
+from init_test import parsSmlFileData
 
 try:
     # unhexlify for micropython
@@ -58,7 +58,7 @@ def run(
         bytesize=serialProps.bytesize,
         parity=serialProps.parity,
         stopbits=serialProps.stopbits,
-        timeout=4
+        timeout=4,
     ) as serialDevice:
         serialDevice.close()
         serialDevice.open()
@@ -92,23 +92,14 @@ def convertDataToSmlEntries(
     writer.writeData(smlEntries)
 
 
-def runTest(dataWriter: WriteData, meterProperties: MeterProperties):
-    b2 = bytes.fromhex(
-        "0000006200620200620062007265000002017101632f35001b1b1b1b1a00c16c1b1b1b1b010101017605000000006200620072650000010176010105000000000b0a0153414720014333e37262016503e666490163cecc007605000000016200620072650000070177010b0a0153414720014333e3070100620affff7262016503e6664979770701006032010101010101045341470177070100600100ff010101010b0a0153414720014333e30177070100010800ff65001c01047262016503e66649621e52ff69000000000303d7c20177070100010801ff017262016503e66649621e52ff6900000000016d636f0177070100010802ff017262016503e66649621e52ff6900000000019674530177070100020800ff017262016503e66649621e52ff69000000000b8bca870177070100020801ff017262016503e66649621e52ff6900000000096d78c70177070100020802ff017262016503e66649621e52ff6900000000021e51c00177070100100700ff0101621b520059000000000000012801010163c9a20076050062007265000002017101632f35001b1b1b1b1a0060f10000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
-    )
-    b3 = bytes.fromhex(
-        "78fe00788000781b1b1b010101017605000000006200620200620062007265000002017101632f35001b1b1b1b"
-    )
-    b4 = bytes.fromhex(
-        "1B1B1B1B010101017605F12CAD07620062007263010176010102310B0A01445A47000282225E7262016505E748D7620263955C007605F22CAD07620062007263070177010B0A01445A47000282225E070100620AFFFF7262016505E748D77577070100603201010172620162006200520004445A470177070100600100FF017262016200620052000B0A01445A47000282225E0177070100010800FF641C01047262016200621E52FF65033C93890177070100020800FF017262016200621E52FF650FA49A9E0177070100100700FF017262016200621B52FE538B28010101636B99007605F32CAD076200620072630201710163D90C00001B1B1B1B1A01C3E1"
-    )
-    b5 = bytes.fromhex("")
-    logging.info("\nRun Test!\n")
-    convertDataToSmlEntries(b3, dataWriter, meterProperties)
-
-
-if __name__ == "__main__":
+def initialArgumentParser():
     parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--log",
+        "-l",
+        default="ERROR",
+        help="Set log level. Level: CRITICAL, FATAL, ERROR, WARNING, WARNING, INFO, DEBUG, NOTSET ",
+    )
     parser.add_argument(
         "--device",
         help="The name of the device which is monitored",
@@ -131,25 +122,31 @@ if __name__ == "__main__":
         "--mqtt",
         action="store_true",
     )
-    parser.add_argument("--debug", action="store_true")
+
     parser.add_argument("-rr", help="repetition rate in 1 minute", default=1)
-    testGroup = parser.add_argument_group("test")
-    testGroup.add_argument("--test", action="store_true")
+    testGroup = parser.add_argument_group("test", description="Run test for sml data.")
+    testGroup.add_argument("--test", "-t", action="store_true")
+    testGroup.add_argument("--file", "-f", help="File path to the hex data file.")
+
+    return parser
+
+
+if __name__ == "__main__":
+    parser = initialArgumentParser()
     args = parser.parse_args()
 
-    obisValueIndex = findMeterConfiguration(args.meter)
+    meterConfiguration = findMeterConfiguration(args.meter)
+    logging.basicConfig(level=args.log)
     serialProperties = SerialProperties()
-    if args.debug:
-        logging.basicConfig(level=logging.DEBUG)
 
     if args.support:
         print(findSupportedMeter())
     elif args.test:
-        writer = WriteData()
-        runTest(writer, obisValueIndex)
+        logging.info("Run test")
+        parsSmlFileData(args.file, meterConfiguration)
     elif args.mqtt:
         mqttWrite = MqttDataWriter(args.url, args.port, args.topic, args.qos)
-        run(mqttWrite, obisValueIndex, serialProperties)
+        run(mqttWrite, meterConfiguration, serialProperties)
     else:
         writer = WriteData()
-        valueResults = run(writer, obisValueIndex, serialProperties)
+        valueResults = run(writer, meterConfiguration, serialProperties)

@@ -31,3 +31,8 @@ sudo nano /etc/systemd/system/grid-meter1.servic
 systemctl start grid-meter1.service
 ```
 
+## test
+Run a test with hex data file
+```sh
+read_meter_values.py --test --meter BZPlus3 --file sml_files/bz-pus-10.hex -l DEBUG 
+```
