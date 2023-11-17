@@ -10,6 +10,8 @@ except ImportError:
     # default to python standard
     from binascii import hexlify
 
+logger = logging.getLogger('general_logger')
+
 
 class SmlConfig:
     def __init__(
@@ -82,7 +84,7 @@ def parsValueToString(value: bytes):
     try:
         return hexlify(value).decode("ascii")
     except Exception as e:
-        logging.exception(e)
+        logger.exception(e)
         return value.hex()
 
 
@@ -108,6 +110,10 @@ def parsSmlBlock(data: bytes, smlBlock: SmlBlock, sequenzCount=-1):
             dataValue = parsBytesToNumber(data[1:3], sequencHex)
             data = data[3:]
             smlBlock.values.append(dataValue)
+        elif sequencHex == "54" or sequencHex == "64":
+            dataValue = parsBytesToNumber(data[1:4], sequencHex)
+            data = data[4:]
+            smlBlock.values.append(dataValue)    
         elif sequencHex == "55" or sequencHex == "65":
             dataValue = parsBytesToNumber(data[1:5], sequencHex)
             data = data[5:]
@@ -139,16 +145,16 @@ def findMessageWithEscapeSequenc(data: bytes, smlConfig: SmlConfig):
     msgBlockStartBlockBytes = bytes.fromhex(smlConfig.msgBlockStartBlock)
     while data.find(msgBlockStartBlockBytes) >= 0:
         startMsgBlockIndex = data.find(msgBlockStartBlockBytes, startMsgBlockIndex)
-        logging.debug("Message block start index: {}".format(startMsgBlockIndex))
+        logger.debug("Message block start index: {}".format(startMsgBlockIndex))
         if startMsgBlockIndex >= 0:
             firstBlockValueIndex = startMsgBlockIndex + len(msgBlockStartBlockBytes)
             endEscapeSequenzIndex = data.find(
                 endEscapeSequenzBytes, firstBlockValueIndex
             )
-            logging.debug("Message block end index: {}".format(endEscapeSequenzIndex))
+            logger.debug("Message block end index: {}".format(endEscapeSequenzIndex))
             if endEscapeSequenzIndex - firstBlockValueIndex > 0:
                 newMsgBlock = data[firstBlockValueIndex:endEscapeSequenzIndex]
-                logging.debug("Message block found: {}".format(newMsgBlock.hex()))
+                logger.debug("Message block found: {}".format(newMsgBlock.hex()))
                 startMsgBlockIndex = 0
                 data = data[(endEscapeSequenzIndex + len(endEscapeSequenzBytes) + 4) :]
                 # todo check msg block check sum last 1a xx YY ZZ
@@ -169,10 +175,10 @@ def trimSmlBlock(smlBlock: SmlBlock):
 
 
 def encodeSml(data: bytes, smlConfig: SmlConfig):
-    logging.debug("encode sml data (bytes)")
+    logger.debug("encode sml data (bytes)")
     msgBlocks = findMessageWithEscapeSequenc(data, smlConfig)
     if len(msgBlocks) == 0:
-        logging.warning("Non message block found in the data.")
+        logger.warning("Non message block found in the data.")
 
     smlBlock = SmlBlock()
     findSmlBlock = []
@@ -181,7 +187,7 @@ def encodeSml(data: bytes, smlConfig: SmlConfig):
             data, changedBlock = parsSmlBlock(msgBlock, smlBlock)
             newSmlBlock = trimSmlBlock(changedBlock)
             findSmlBlock.append(newSmlBlock)
-            logging.debug("Find sml block: \n{}".format(newSmlBlock.reprJSON()))
+            logger.debug("Find sml block: \n{}".format(newSmlBlock.reprJSON()))
         except Exception as e:
             logging.error(e)
 

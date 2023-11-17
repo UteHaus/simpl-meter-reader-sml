@@ -44,13 +44,13 @@ OBIS_NAMES = {
 class ObisEntryValueIndex:
     def __init__(
         self,
-        obisIndex: int,
-        statusIndex: int,
-        timeIndex: int,
-        unitIndex: int,
-        scalerIndex: int,
-        valueIndex: int,
-        valueSignature: int,
+        obisIndex: int=1,
+        statusIndex: int=-1,
+        timeIndex: int=-1,
+        unitIndex: int=-1,
+        scalerIndex: int=-1,
+        valueIndex: int=-1,
+        valueSignature: int=-1,
         obisKey: str = None,
         manualScaler: float = None,
     ):

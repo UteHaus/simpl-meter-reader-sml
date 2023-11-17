@@ -23,6 +23,7 @@ try:
 except ImportError:
     logging.error("serial package not found")
 
+logger = logging.getLogger('general_logger')
 
 class SerialProperties:
     def __init__(
@@ -50,7 +51,7 @@ def run(
     meterProperties: MeterProperties,
     serialProps: SerialProperties,
 ):
-    logging.info("Starting read data")
+    logger.info("Starting read data")
     with serial.Serial(
         serialProps.devicePath,
         serialProps.serialPort,
@@ -68,7 +69,7 @@ def run(
 
 
 def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterProperties):
-    logging.info("Read data from serial port {}".format(serialProperties.devicePath))
+    logger.info("Read data from serial port {}".format(serialProperties.devicePath))
     smlMsg = bytearray()
     startSequenc = bytes.fromhex(meterProperties.smlConfig.msgBlockStartBlock)
     endSequenc = bytes.fromhex(meterProperties.smlConfig.endEscapeSequenz)
@@ -82,7 +83,7 @@ def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterPrope
                     smlMsg.extend(serialDevice.read())
                     if smlMsg.find(endSequenc) >= 0:
                         smlMsg.extend(serialDevice.read(3))
-                        logging.debug("Serial raw:\n{}".format(smlMsg.hex()))
+                        logger.debug("Serial raw:\n{}".format(smlMsg.hex()))
                         threading.Thread(
                             target=convertDataToSmlEntries(
                                 smlMsg, writer, meterProperties
@@ -92,7 +93,7 @@ def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterPrope
                         time.sleep(10)
                         break
     except Exception as e:
-        logging.error(e)
+        logger.error(e)
         serialDevice.close()
         time.sleep(60)
         serialDevice.open()
@@ -154,13 +155,13 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     meterConfiguration = findMeterConfiguration(args.meter)
-    logging.basicConfig(level=args.log)
+    logger.setLevel(args.log)
     serialProperties = SerialProperties()
 
     if args.support:
         print(findSupportedMeter())
     elif args.test:
-        logging.info("Run test")
+        logger.info("Run test")
         parsSmlFileData(args.file, meterConfiguration)
     elif args.mqtt:
         mqttWrite = MqttDataWriter(args.url, args.port, args.topic, args.qos)

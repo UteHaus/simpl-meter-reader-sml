@@ -4,6 +4,8 @@ from obis_keys import OBIS_NAMES
 from meter_obis_value_index import MeterProperties
 import logging
 
+logger = logging.getLogger('general_logger')
+
 
 class SmlEntry:
     def sensorValue(self, baseValue: int, scaler: float):
@@ -43,7 +45,7 @@ def findValueForObisIndex(smlBlock: SmlBlock, obisValueIndex: int):
         if len(smlBlock.values) >= obisValueIndex:
             return smlBlock.values[obisValueIndex]
         else:
-            logging.warning(
+            logger.warning(
                 "No value found on index {}. The sml block: {}".format(
                     obisValueIndex, smlBlock.reprJSON()
                 )
