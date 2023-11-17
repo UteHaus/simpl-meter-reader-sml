@@ -10,16 +10,12 @@ except ImportError:
     # default to python standard
     from binascii import hexlify
 
-escapeSequenz: str = "1b1b1b1b"
-smlVersion = "01010101"
-msgBlockStartBlock = escapeSequenz + smlVersion
-
 
 class SmlConfig:
     def __init__(
         self,
         startEscapeSequenz: str = "1b1b1b1b",
-        endEscapeSequenz: str = "1b1b1b1b",
+        endEscapeSequenz: str = "1b1b1b1b1a",
         smlVersion: str = "01010101",
     ):
         super().__init__()

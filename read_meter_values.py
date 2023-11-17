@@ -15,6 +15,7 @@ from meter_obis_value_index import (
     MeterProperties,
 )
 from init_test import parsSmlFileData
+import threading
 
 try:
     # unhexlify for micropython
@@ -58,21 +59,38 @@ def run(
         bytesize=serialProps.bytesize,
         parity=serialProps.parity,
         stopbits=serialProps.stopbits,
-        timeout=4,
     ) as serialDevice:
-        serialDevice.close()
-        serialDevice.open()
         while True:
+            serialDevice.close()
+            serialDevice.open()
             generateMetrics(serialDevice, writer, meterProperties)
             time.sleep(60)
 
 
 def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterProperties):
     logging.info("Read data from serial port {}".format(serialProperties.devicePath))
+    smlMsg = bytearray()
+    startSequenc = bytes.fromhex(meterProperties.smlConfig.msgBlockStartBlock)
+    endSequenc = bytes.fromhex(meterProperties.smlConfig.endEscapeSequenz)
     try:
-        raw = serialDevice.read_until(bytes.fromhex("00000000000000"), 1000)
-        logging.debug("Serial raw:\n{}".format(raw.hex()))
-        convertDataToSmlEntries(raw, writer, meterProperties)
+        while True:
+            smlMsg.extend(serialDevice.read())
+            startIndex = smlMsg.find(startSequenc)
+            if startIndex >= 0:
+                smlMsg = bytearray(smlMsg[startIndex:])
+                while True:
+                    smlMsg.extend(serialDevice.read())
+                    if smlMsg.find(endSequenc) >= 0:
+                        smlMsg.extend(serialDevice.read(3))
+                        logging.debug("Serial raw:\n{}".format(smlMsg.hex()))
+                        threading.Thread(
+                            target=convertDataToSmlEntries(
+                                smlMsg, writer, meterProperties
+                            )
+                        )
+                        smlMsg.clear()
+                        time.sleep(10)
+                        break
     except Exception as e:
         logging.error(e)
         serialDevice.close()
