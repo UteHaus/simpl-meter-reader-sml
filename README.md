@@ -15,9 +15,13 @@ This tool help you to read SML based meters.
 
 ## run 
 
-example howe to run
+example with console output
 ```sh
-python read_meter_values.py --device /dev/ttyAMA0 --mqtt --url patu --topic meter/grid/meter1/
+python read_meter_values.py --device /dev/ttyAMA0 --meter BZPlus3
+```
+example with mqtt 
+```sh
+python read_meter_values.py --device /dev/ttyAMA0 --mqtt --url 172.0.0.1 --topic meter/grid/meter1/ --meter BZPlus3
 ```
 
 
