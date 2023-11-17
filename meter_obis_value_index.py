@@ -13,6 +13,7 @@ class Meters(Enum):
     """
 
     BZPlus3 = "BZPlus3"
+    eBZ_DD3_DD3BZ06DTA_SMZ1="eBZ_DD3_DD3BZ06DTA-SMZ1"
 
 
 class MeterProperties:
@@ -43,7 +44,10 @@ def findMeterConfiguration(meterKey: Union[Meters, str]):
     meter = Meters[meterKey] if isinstance(meterKey, str) else meterKey
     if Meters.BZPlus3.value == meter.value:
         return bZPlus3Configuration()
-
+    
+    if Meters.eBZ_DD3_DD3BZ06DTA_SMZ1.value== meter.value:
+        return eBZDD3DD3BZ06DTASMZ1()
+    
     logging.warning(
         "No supported meter for {}. Add new device on file meter_obis_value_index.py".format(
             meterKey
@@ -57,6 +61,9 @@ def findMeterConfiguration(meterKey: Union[Meters, str]):
 def findSupportedMeter():
     return list(Meters)
 
+
+def eBZDD3DD3BZ06DTASMZ1():
+    return MeterProperties( ObisEntryValueIndex(1,unitIndex=3 ,valueIndex=5),SmlConfig() )
 
 def bZPlus3Configuration():
     gridFeedValueIndex = ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1, manualScaler=0.1)

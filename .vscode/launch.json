@@ -14,9 +14,9 @@
             "args": [
                 "--test",
                 "--meter",
-                "BZPlus3",
+                "eBZ_DD3_DD3BZ06DTA_SMZ1",
                 "--file",
-                "sml_files/bz-pus-10.hex",
+                "sml_files/eBZ_DD3_DD3BZ06DTA-SMZ1_without_PIN.hex",
                 "-l",
                 "DEBUG"
             ]
