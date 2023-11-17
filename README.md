@@ -6,12 +6,11 @@ This tool help you to read SML based meters.
 
 ## features
 
-[x] config SML search properties
-[x] config OBIS value index
-[x] run reader as service (linux)
-[ ] CRC16 check
-[ ] Test 
-
+- [x] config SML search properties
+- [x] config OBIS value index
+- [x] run reader as service (linux)
+- [ ] CRC16 check
+- [x] Test 
 
 ## run 
 
@@ -40,3 +39,7 @@ Run a test with hex data file
 ```sh
 read_meter_values.py --test --meter BZPlus3 --file sml_files/bz-pus-10.hex -l DEBUG 
 ```
+
+
+## existing meter configurations
+- Sagemcom Smarty BZ-Plu 10
