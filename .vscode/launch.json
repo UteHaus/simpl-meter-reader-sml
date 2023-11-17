@@ -16,7 +16,7 @@
                 "--meter",
                 "eBZ_DD3_DD3BZ06DTA_SMZ1",
                 "--file",
-                "sml_files/eBZ_DD3_DD3BZ06DTA-SMZ1_without_PIN.hex",
+                "testing/libsml-testing/eBZ_DD3_DD32R06DTA-SMZ1.hex",
                 "-l",
                 "DEBUG"
             ]

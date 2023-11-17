@@ -14,7 +14,7 @@ from meter_obis_value_index import (
     findMeterConfiguration,
     MeterProperties,
 )
-from init_test import parsSmlFileData
+from testing.init_test import parsSmlFileData
 import threading
 
 try:
