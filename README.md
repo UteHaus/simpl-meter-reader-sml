@@ -1,8 +1,6 @@
-# simple meter read (SML)  ----- CURRENTLY IN PROGRESS ------
-
+# simple meter read (SML)  
 
 This tool help you to read SML based meters.
-
 
 ## features
 
@@ -13,6 +11,18 @@ This tool help you to read SML based meters.
 - [x] Test 
 
 ## run 
+
+### packages
+
+This tool use for serial reading the [pyserial](https://pyserial.readthedocs.io/en/latest/index.html) package.
+```
+python -m pip install pyserial
+```
+For mqtt 
+```
+pip install paho-mqtt
+```
+### execution samples
 
 example with console output
 ```sh
