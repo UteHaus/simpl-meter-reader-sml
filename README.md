@@ -43,3 +43,4 @@ read_meter_values.py --test --meter BZPlus3 --file sml_files/bz-pus-10.hex -l DE
 
 ## existing meter configurations
 - Sagemcom Smarty BZ-Plu
+- eBZ DD3 DD3BZ06DTA SMZ1
