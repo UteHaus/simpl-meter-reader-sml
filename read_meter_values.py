@@ -18,7 +18,6 @@ from testing.init_test import parsSmlFileData
 import threading
 
 try:
-    # unhexlify for micropython
     import serial
 except ImportError:
     logging.error("serial package not found")
@@ -62,10 +61,21 @@ def run(
         stopbits=serialProps.stopbits,
     ) as serialDevice:
         while True:
-            serialDevice.close()
-            serialDevice.open()
-            generateMetrics(serialDevice, writer, meterProperties)
-            time.sleep(60)
+            try:
+                serialDevice.close()
+                serialDevice.open()
+                generateMetrics(serialDevice, writer, meterProperties)
+            except serial.SerialException as e:
+                logger.error(e)
+                time.sleep(60)
+            except Exception as e:
+                logger.error(e)
+                time.sleep(60)
+            except KeyboardInterrupt:
+                serialDevice.close()
+                sys.stdout.write("\program closed!\n")
+                exit()
+
 
 
 def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterProperties):
@@ -97,10 +107,6 @@ def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterPrope
         serialDevice.close()
         time.sleep(60)
         serialDevice.open()
-    except KeyboardInterrupt:
-        serialDevice.close()
-        sys.stdout.write("\program closed!\n")
-        exit()
 
 
 def convertDataToSmlEntries(
