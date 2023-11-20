@@ -66,19 +66,9 @@ def eBZDD3DD3BZ06DTASMZ1():
     return MeterProperties( ObisEntryValueIndex(1,unitIndex=3 ,valueIndex=5),SmlConfig() )
 
 def bZPlus3Configuration():
-    gridFeedValueIndex = ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1, manualScaler=0.1)
     obisValueIndexBzPlus = MeterProperties(
-        ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1),
+        ObisEntryValueIndex(0, -1, -1, 2, 3, 4, -1, manualScaler=0.1),
         SmlConfig(startEscapeSequenz="1b1b1b1b"),
-    )
-    obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
-        "0100020800", gridFeedValueIndex
-    )
-    obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
-        "0100020801", gridFeedValueIndex
-    )
-    obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
-        "0100020802", gridFeedValueIndex
     )
     obisValueIndexBzPlus.addAdditionalObisEntryValueIndex(
         "0100100700", ObisEntryValueIndex(0, -1, -1, 3, 4, 5, -1)
