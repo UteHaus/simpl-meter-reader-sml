@@ -14,9 +14,9 @@
             "args": [
                 "--test",
                 "--meter",
-                "eBZ_DD3_DD3BZ06DTA_SMZ1",
+                "BZPlus3",
                 "--file",
-                "testing/libsml-testing/eBZ_DD3_DD32R06DTA-SMZ1.hex",
+                "testing/addition-smls/bz-pus-10.hex",
                 "-l",
                 "DEBUG"
             ]

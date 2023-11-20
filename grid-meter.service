@@ -1,0 +1,13 @@
+[Unit]
+Description=collect grid meter data
+
+[Service]
+Type=simple
+User=root
+#ExecStart=/bin/bash /opt/grid-meter1/run-meter-collection.sh
+ExecStart=/bin/python /opt/grid-meter1/read_meter_values.py --mqtt --url localhost --topic grid/meter1/ --meter BZPlus3
+Restart=always
+RestartSec=60
+
+[Install]
+WantedBy=multi-user.target
