@@ -102,25 +102,10 @@ def parsSmlBlock(data: bytes, smlBlock: SmlBlock, sequenzCount=-1):
             else:
                 smlBlock.values.append(None)
             data = data[(dataLenght + 1) :]
-        elif sequencHex == "52" or sequencHex == "62":
-            dataValue = parsBytesToNumber(data[1:2], sequencHex)
-            data = data[2:]
-            smlBlock.values.append(dataValue)
-        elif sequencHex == "53" or sequencHex == "63":
-            dataValue = parsBytesToNumber(data[1:3], sequencHex)
-            data = data[3:]
-            smlBlock.values.append(dataValue)
-        elif sequencHex == "54" or sequencHex == "64":
-            dataValue = parsBytesToNumber(data[1:4], sequencHex)
-            data = data[4:]
-            smlBlock.values.append(dataValue)    
-        elif sequencHex == "55" or sequencHex == "65":
-            dataValue = parsBytesToNumber(data[1:5], sequencHex)
-            data = data[5:]
-            smlBlock.values.append(dataValue)
-        elif sequencHex == "59" or sequencHex == "69":
-            dataValue = parsBytesToNumber(data[1:9], sequencHex)
-            data = data[9:]
+        elif sequencHex.startswith("5") or sequencHex.startswith("6"):
+            valueLength= int.from_bytes(bytes.fromhex( ("0"+sequencHex[1])))
+            dataValue = parsBytesToNumber(data[1:valueLength], sequencHex)
+            data = data[valueLength:]
             smlBlock.values.append(dataValue)
         elif sequencHex == "42":
             value = bool.from_bytes(data[1, 2])
