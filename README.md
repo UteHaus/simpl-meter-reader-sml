@@ -11,6 +11,8 @@ This tool help you to read SML based meters.
 - [x] Test 
 
 ## run 
+Find your serial port like `S0` or `ttyAMA0` and use it instead fo my example port `ttyAMA0`.
+
 
 ### packages
 
@@ -32,14 +34,24 @@ example with mqtt
 ```sh
 python read_meter_values.py --device /dev/ttyAMA0 --mqtt --url 172.0.0.1 --topic meter/grid/meter1/ --meter BZPlus3
 ```
-
+Your service name has a differ port name as my `ttyAMA0`.
 
 ## setup
-### service
 
+## system
+
+To read the serial data without system breaks, it is better to stop the service `serial-getty@[your serial port].service`:
 ```sh
-sudo nano /etc/systemd/system/grid-meter1.servic
+systemctl stop serial-getty@ttyAMA0.service
 ```
+
+
+### service
+Copy the service to the `system`. (Optional) change the device name.
+```sh
+sudo cp grid-meter1.servic nano /etc/systemd/system/
+```
+Start the service.
 ```sh
 systemctl start grid-meter1.service
 ```

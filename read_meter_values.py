@@ -51,7 +51,28 @@ def run(
     serialProps: SerialProperties,
 ):
     logger.info("Starting read data")
-    with serial.Serial(
+    while True:
+        with newInstanceOfSerial(serialProps)  as serialDevice:
+            try:
+                serialDevice.close() #when the port is already open, close the port 
+                serialDevice.open()
+                generateMetrics(serialDevice, writer, meterProperties)
+            except serial.SerialException as e:
+                logger.error(e)
+            except Exception as e:
+                logger.error(e)
+            except KeyboardInterrupt:
+                serialDevice.close()
+                sys.stdout.write("\program closed!\n")
+                exit()
+            finally:
+                serialDevice.close()
+        time.sleep(60)
+
+        
+
+def newInstanceOfSerial(serialProps: SerialProperties):
+    return serial.Serial(
         serialProps.devicePath,
         serialProps.serialPort,
         xonxoff=serialProps.xonxoff,
@@ -59,23 +80,7 @@ def run(
         bytesize=serialProps.bytesize,
         parity=serialProps.parity,
         stopbits=serialProps.stopbits,
-    ) as serialDevice:
-        while True:
-            try:
-                serialDevice.close()
-                serialDevice.open()
-                generateMetrics(serialDevice, writer, meterProperties)
-            except serial.SerialException as e:
-                logger.error(e)
-                time.sleep(60)
-            except Exception as e:
-                logger.error(e)
-                time.sleep(60)
-            except KeyboardInterrupt:
-                serialDevice.close()
-                sys.stdout.write("\program closed!\n")
-                exit()
-
+    ) 
 
 
 def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterProperties):
@@ -88,6 +93,7 @@ def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterPrope
             smlMsg.extend(serialDevice.read())
             startIndex = smlMsg.find(startSequenc)
             if startIndex >= 0:
+                # map bytes to SML data set
                 smlMsg = bytearray(smlMsg[startIndex:])
                 while True:
                     smlMsg.extend(serialDevice.read())
