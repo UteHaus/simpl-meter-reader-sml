@@ -55,7 +55,6 @@ def run(
         with newInstanceOfSerial(serialProps)  as serialDevice:
             try:
                 serialDevice.close() #when the port is already open, close the port 
-                serialDevice.open()
                 generateMetrics(serialDevice, writer, meterProperties)
             except serial.SerialException as e:
                 logger.error(e)
@@ -88,32 +87,36 @@ def generateMetrics(serialDevice, writer: WriteData, meterProperties: MeterPrope
     smlMsg = bytearray()
     startSequenc = bytes.fromhex(meterProperties.smlConfig.msgBlockStartBlock)
     endSequenc = bytes.fromhex(meterProperties.smlConfig.endEscapeSequenz)
-    try:
-        while True:
-            smlMsg.extend(serialDevice.read())
-            startIndex = smlMsg.find(startSequenc)
-            if startIndex >= 0:
-                # map bytes to SML data set
-                smlMsg = bytearray(smlMsg[startIndex:])
-                while True:
-                    smlMsg.extend(serialDevice.read())
-                    if smlMsg.find(endSequenc) >= 0:
-                        smlMsg.extend(serialDevice.read(3))
-                        logger.debug("Serial raw:\n{}".format(smlMsg.hex()))
-                        threading.Thread(
-                            target=convertDataToSmlEntries(
-                                smlMsg, writer, meterProperties
-                            )
-                        )
-                        smlMsg.clear()
-                        time.sleep(10)
-                        break
-    except Exception as e:
-        logger.error(e)
-        serialDevice.close()
-        time.sleep(60)
-        serialDevice.open()
-
+    startIndex=0
+    # open and close the serial connection to prevent serial connection breaks and consistently data sets.
+    serialDevice.open()
+    
+    # find start sequenc
+    while True:
+        smlMsg.extend(serialDevice.read())
+        startIndex = smlMsg.find(startSequenc)
+    
+        if startIndex >= 0:
+            break
+        
+    # buffer bytes and map bytes to SML data set
+    smlMsg = bytearray(smlMsg[startIndex:])
+    while True:
+        smlMsg.extend(serialDevice.read())
+        if smlMsg.find(endSequenc) >= 0:
+            smlMsg.extend(serialDevice.read(3))
+            logger.debug("Serial raw:\n{}".format(smlMsg.hex()))
+            threading.Thread(
+                target=convertDataToSmlEntries(
+                    smlMsg, writer, meterProperties
+                )
+            )
+            smlMsg.clear()
+            break
+        
+    time.sleep(20)    
+    serialDevice.close()
+            
 
 def convertDataToSmlEntries(
     data: bytes, writer: WriteData, meterProperties: MeterProperties
