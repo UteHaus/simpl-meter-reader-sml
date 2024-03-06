@@ -36,7 +36,9 @@ python read_meter_values.py --device /dev/ttyAMA0 --mqtt --url 172.0.0.1 --topic
 ```
 Your service name has a differ port name as my `ttyAMA0`.
 
-## setup
+## setup grid meter
+### Sagemcom Smarty BZ-Plu
+Unter den Einstellungen muss das dSS-Protokollstandard auf `dSS-r` gesetzt werden. Dazu muss SML Einstellung auf dSS-r eingestellt werden.
 
 ## system
 
