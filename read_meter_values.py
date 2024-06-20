@@ -171,7 +171,7 @@ if __name__ == "__main__":
 
     meterConfiguration = findMeterConfiguration(args.meter)
     logger.setLevel(args.log)
-    serialProperties = SerialProperties()
+    serialProperties = SerialProperties(devicePath=args.device)
 
     if args.support:
         print(findSupportedMeter())
